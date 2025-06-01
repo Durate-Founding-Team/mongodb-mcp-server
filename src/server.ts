@@ -100,6 +100,14 @@ export class Server {
     }
 
     /**
+     * Public method to validate server configuration
+     * This can be called before establishing connections to ensure the server is properly configured
+     */
+    async validateConfiguration(): Promise<void> {
+        await this.validateConfig();
+    }
+
+    /**
      * Emits a server event
      * @param command - The server command (e.g., "start", "stop", "register", "deregister")
      * @param additionalProperties - Additional properties specific to the event
