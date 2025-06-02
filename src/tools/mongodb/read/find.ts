@@ -9,7 +9,7 @@ export const FindArgs = {
     filter: z
         .record(z.string(), z.unknown())
         .optional()
-        .describe("The query filter, matching the syntax of the query argument of db.collection.find()"),
+        .describe("The query filter, matching the syntax of the query argument of db.collection.find(). If a string looks like a mongodb id please use $oid to make the program understand it is an id."),
     projection: z
         .record(z.string(), z.unknown())
         .optional()

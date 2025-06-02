@@ -5,7 +5,7 @@ import { ToolArgs, OperationType } from "../../tool.js";
 import { EJSON } from "bson";
 
 export const AggregateArgs = {
-    pipeline: z.array(z.record(z.string(), z.unknown())).describe("An array of aggregation stages to execute"),
+    pipeline: z.array(z.record(z.string(), z.unknown())).describe("An array of aggregation stages to execute. If a string looks like a mongodb id please use $oid to make the program understand it is an id."),
 };
 
 export class AggregateTool extends MongoDBToolBase {
