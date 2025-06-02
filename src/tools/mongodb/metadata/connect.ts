@@ -64,7 +64,7 @@ export class ConnectTool extends MongoDBToolBase {
                 );
                 break;
         }
-
+        
         await this.connectToMongoDB(connectionString);
         this.updateMetadata();
         return {
@@ -79,18 +79,10 @@ export class ConnectTool extends MongoDBToolBase {
     }
 
     private updateMetadata(): void {
-        if (this.config.connectionString || this.session.serviceProvider) {
-            this.update?.({
-                name: connectedName,
-                description: connectedDescription,
-                inputSchema: connectedSchema,
-            });
-        } else {
-            this.update?.({
-                name: disconnectedName,
-                description: disconnectedDescription,
-                inputSchema: disconnectedSchema,
-            });
-        }
+        this.update?.({
+            name: disconnectedName,
+            description: disconnectedDescription,
+            inputSchema: disconnectedSchema,
+        });
     }
 }

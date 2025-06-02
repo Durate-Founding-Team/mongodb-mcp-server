@@ -23,6 +23,7 @@ export interface UserConfig {
     connectOptions: ConnectOptions;
     disabledTools: Array<string>;
     readOnly?: boolean;
+    defaultDatabase: string;
 }
 
 const defaults: UserConfig = {
@@ -37,6 +38,7 @@ const defaults: UserConfig = {
     disabledTools: [],
     telemetry: "enabled",
     readOnly: false,
+    defaultDatabase: "test",
 };
 
 export const config = {

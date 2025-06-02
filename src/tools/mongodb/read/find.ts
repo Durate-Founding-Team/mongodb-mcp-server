@@ -14,7 +14,7 @@ export const FindArgs = {
         .record(z.string(), z.unknown())
         .optional()
         .describe("The projection, matching the syntax of the projection argument of db.collection.find()"),
-    limit: z.number().optional().default(10).describe("The maximum number of documents to return"),
+    limit: z.number().optional().default(0).describe("The maximum number of documents to return"),
     sort: z
         .record(z.string(), z.custom<SortDirection>())
         .optional()
@@ -39,7 +39,21 @@ export class FindTool extends MongoDBToolBase {
         sort,
     }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const documents = await provider.find(database, collection, filter, { projection, limit, sort }).toArray();
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        console.log("effectiveDatabase", effectiveDatabase);
+        console.log("collection", collection);
+        console.log("projection", projection);
+        console.log("limit", limit);
+        console.log("sort", sort);
+        
+        // Parse filter using EJSON to handle ObjectIds and other BSON types
+        const parsedFilter = filter ? EJSON.parse(JSON.stringify(filter)) : filter;
+        console.log("filter", parsedFilter);
+
+        
+        const documents = await provider.find(effectiveDatabase, collection, parsedFilter, { projection, limit, sort }).toArray();
+
+        console.log("These are the documents", documents);
 
         const content: Array<{ text: string; type: "text" }> = [
             {

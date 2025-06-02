@@ -9,10 +9,11 @@ export class CollectionStorageSizeTool extends MongoDBToolBase {
 
     protected operationType: OperationType = "metadata";
 
-    protected async execute({ database, collection }: ToolArgs<typeof DbOperationArgs>): Promise<CallToolResult> {
+    protected async execute({ database, collection }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
+        const effectiveDatabase = this.getEffectiveDatabase(database);
         const [{ value }] = (await provider
-            .aggregate(database, collection, [
+            .aggregate(effectiveDatabase, collection, [
                 { $collStats: { storageStats: {} } },
                 { $group: { _id: null, value: { $sum: "$storageStats.size" } } },
             ])
@@ -23,7 +24,7 @@ export class CollectionStorageSizeTool extends MongoDBToolBase {
         return {
             content: [
                 {
-                    text: `The size of "${database}.${collection}" is \`${scaledValue.toFixed(2)} ${units}\``,
+                    text: `The size of "${effectiveDatabase}.${collection}" is \`${scaledValue.toFixed(2)} ${units}\``,
                     type: "text",
                 },
             ],
@@ -35,10 +36,11 @@ export class CollectionStorageSizeTool extends MongoDBToolBase {
         args: ToolArgs<typeof this.argsShape>
     ): Promise<CallToolResult> | CallToolResult {
         if (error instanceof Error && "codeName" in error && error.codeName === "NamespaceNotFound") {
+            const effectiveDatabase = this.getEffectiveDatabase(args.database);
             return {
                 content: [
                     {
-                        text: `The size of "${args.database}.${args.collection}" cannot be determined because the collection does not exist.`,
+                        text: `The size of "${effectiveDatabase}.${args.collection}" cannot be determined because the collection does not exist.`,
                         type: "text",
                     },
                 ],

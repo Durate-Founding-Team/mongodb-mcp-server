@@ -14,7 +14,8 @@ export class DbStatsTool extends MongoDBToolBase {
 
     protected async execute({ database }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const result = await provider.runCommandWithCheck(database, {
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const result = await provider.runCommandWithCheck(effectiveDatabase, {
             dbStats: 1,
             scale: 1,
         });
@@ -22,7 +23,7 @@ export class DbStatsTool extends MongoDBToolBase {
         return {
             content: [
                 {
-                    text: `Statistics for database ${database}`,
+                    text: `Statistics for database ${effectiveDatabase}`,
                     type: "text",
                 },
                 {

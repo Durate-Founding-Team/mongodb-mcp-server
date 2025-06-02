@@ -144,7 +144,8 @@ export class Server {
     }
 
     private registerTools() {
-        for (const tool of [...AtlasTools, ...MongoDbTools]) {
+        // for (const tool of [...AtlasTools, ...MongoDbTools]) {
+        for (const tool of [...MongoDbTools]) {
             new tool(this.session, this.userConfig, this.telemetry).register(this.mcpServer);
         }
     }

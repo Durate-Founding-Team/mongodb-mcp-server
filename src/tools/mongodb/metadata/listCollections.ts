@@ -13,7 +13,8 @@ export class ListCollectionsTool extends MongoDBToolBase {
 
     protected async execute({ database }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const collections = await provider.listCollections(database);
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const collections = await provider.listCollections(effectiveDatabase);
 
         if (collections.length === 0) {
             return {

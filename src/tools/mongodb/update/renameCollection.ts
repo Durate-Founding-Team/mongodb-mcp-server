@@ -20,14 +20,15 @@ export class RenameCollectionTool extends MongoDBToolBase {
         dropTarget,
     }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const result = await provider.renameCollection(database, collection, newName, {
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const result = await provider.renameCollection(effectiveDatabase, collection, newName, {
             dropTarget,
         });
 
         return {
             content: [
                 {
-                    text: `Collection "${collection}" renamed to "${result.collectionName}" in database "${database}".`,
+                    text: `Collection "${collection}" renamed to "${result.collectionName}" in database "${effectiveDatabase}".`,
                     type: "text",
                 },
             ],
@@ -39,12 +40,13 @@ export class RenameCollectionTool extends MongoDBToolBase {
         args: ToolArgs<typeof this.argsShape>
     ): Promise<CallToolResult> | CallToolResult {
         if (error instanceof Error && "codeName" in error) {
+            const effectiveDatabase = this.getEffectiveDatabase(args.database);
             switch (error.codeName) {
                 case "NamespaceNotFound":
                     return {
                         content: [
                             {
-                                text: `Cannot rename "${args.database}.${args.collection}" because it doesn't exist.`,
+                                text: `Cannot rename "${effectiveDatabase}.${args.collection}" because it doesn't exist.`,
                                 type: "text",
                             },
                         ],
@@ -53,7 +55,7 @@ export class RenameCollectionTool extends MongoDBToolBase {
                     return {
                         content: [
                             {
-                                text: `Cannot rename "${args.database}.${args.collection}" to "${args.newName}" because the target collection already exists. If you want to overwrite it, set the "dropTarget" argument to true.`,
+                                text: `Cannot rename "${effectiveDatabase}.${args.collection}" to "${args.newName}" because the target collection already exists. If you want to overwrite it, set the "dropTarget" argument to true.`,
                                 type: "text",
                             },
                         ],

@@ -23,7 +23,12 @@ export class AggregateTool extends MongoDBToolBase {
         pipeline,
     }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const documents = await provider.aggregate(database, collection, pipeline).toArray();
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        
+        // Parse pipeline using EJSON to handle ObjectIds and other BSON types
+        const parsedPipeline = pipeline ? EJSON.parse(JSON.stringify(pipeline)) : pipeline;
+        
+        const documents = await provider.aggregate(effectiveDatabase, collection, parsedPipeline).toArray();
 
         const content: Array<{ text: string; type: "text" }> = [
             {

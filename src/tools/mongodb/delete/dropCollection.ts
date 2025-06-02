@@ -13,12 +13,13 @@ export class DropCollectionTool extends MongoDBToolBase {
 
     protected async execute({ database, collection }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const result = await provider.dropCollection(database, collection);
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const result = await provider.dropCollection(effectiveDatabase, collection);
 
         return {
             content: [
                 {
-                    text: `${result ? "Successfully dropped" : "Failed to drop"} collection "${collection}" from database "${database}"`,
+                    text: `${result ? "Successfully dropped" : "Failed to drop"} collection "${collection}" from database "${effectiveDatabase}"`,
                     type: "text",
                 },
             ],

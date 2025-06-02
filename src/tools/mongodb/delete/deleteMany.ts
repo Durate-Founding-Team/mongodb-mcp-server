@@ -23,7 +23,8 @@ export class DeleteManyTool extends MongoDBToolBase {
         filter,
     }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const result = await provider.deleteMany(database, collection, filter);
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const result = await provider.deleteMany(effectiveDatabase, collection, filter);
 
         return {
             content: [

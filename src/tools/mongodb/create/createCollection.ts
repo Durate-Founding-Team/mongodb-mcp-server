@@ -12,13 +12,14 @@ export class CreateCollectionTool extends MongoDBToolBase {
 
     protected async execute({ collection, database }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        await provider.createCollection(database, collection);
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        await provider.createCollection(effectiveDatabase, collection);
 
         return {
             content: [
                 {
                     type: "text",
-                    text: `Collection "${collection}" created in database "${database}".`,
+                    text: `Collection "${collection}" created in database "${effectiveDatabase}".`,
                 },
             ],
         };

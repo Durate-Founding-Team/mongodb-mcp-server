@@ -25,7 +25,8 @@ export class CountTool extends MongoDBToolBase {
 
     protected async execute({ database, collection, query }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const count = await provider.count(database, collection, query);
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const count = await provider.count(effectiveDatabase, collection, query);
 
         return {
             content: [

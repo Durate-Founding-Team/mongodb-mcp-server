@@ -6,12 +6,16 @@ import { ErrorCodes, MongoDBError } from "../../errors.js";
 import logger, { LogId } from "../../logger.js";
 
 export const DbOperationArgs = {
-    database: z.string().describe("Database name"),
+    database: z.string().optional().default("test").describe("Database name (defaults to configured default database)"),
     collection: z.string().describe("Collection name"),
 };
 
 export abstract class MongoDBToolBase extends ToolBase {
     protected category: ToolCategory = "mongodb";
+
+    protected getEffectiveDatabase(database?: string): string {
+        return database || this.config.defaultDatabase;
+    }
 
     protected async ensureConnected(): Promise<NodeDriverServiceProvider> {
         if (!this.session.serviceProvider && this.config.connectionString) {

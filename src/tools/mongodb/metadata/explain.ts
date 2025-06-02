@@ -44,6 +44,7 @@ export class ExplainTool extends MongoDBToolBase {
         method: methods,
     }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
+        const effectiveDatabase = this.getEffectiveDatabase(database);
         const method = methods[0];
 
         if (!method) {
@@ -56,7 +57,7 @@ export class ExplainTool extends MongoDBToolBase {
                 const { pipeline } = method.arguments;
                 result = await provider
                     .aggregate(
-                        database,
+                        effectiveDatabase,
                         collection,
                         pipeline,
                         {},
@@ -70,13 +71,13 @@ export class ExplainTool extends MongoDBToolBase {
             case "find": {
                 const { filter, ...rest } = method.arguments;
                 result = await provider
-                    .find(database, collection, filter as Document, { ...rest })
+                    .find(effectiveDatabase, collection, filter as Document, { ...rest })
                     .explain(ExplainTool.defaultVerbosity);
                 break;
             }
             case "count": {
                 const { query } = method.arguments;
-                result = await provider.mongoClient.db(database).command({
+                result = await provider.mongoClient.db(effectiveDatabase).command({
                     explain: {
                         count: collection,
                         query,
@@ -90,7 +91,7 @@ export class ExplainTool extends MongoDBToolBase {
         return {
             content: [
                 {
-                    text: `Here is some information about the winning plan chosen by the query optimizer for running the given \`${method.name}\` operation in "${database}.${collection}". This information can be used to understand how the query was executed and to optimize the query performance.`,
+                    text: `Here is some information about the winning plan chosen by the query optimizer for running the given \`${method.name}\` operation in "${effectiveDatabase}.${collection}". This information can be used to understand how the query was executed and to optimize the query performance.`,
                     type: "text",
                 },
                 {

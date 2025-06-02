@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

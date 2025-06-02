@@ -22,7 +22,8 @@ export class CreateIndexTool extends MongoDBToolBase {
         name,
     }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const indexes = await provider.createIndexes(database, collection, [
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const indexes = await provider.createIndexes(effectiveDatabase, collection, [
             {
                 key: keys,
                 name,

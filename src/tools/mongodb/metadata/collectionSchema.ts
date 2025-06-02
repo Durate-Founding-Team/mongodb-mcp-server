@@ -10,9 +10,10 @@ export class CollectionSchemaTool extends MongoDBToolBase {
 
     protected operationType: OperationType = "metadata";
 
-    protected async execute({ database, collection }: ToolArgs<typeof DbOperationArgs>): Promise<CallToolResult> {
+    protected async execute({ database, collection }: ToolArgs<typeof this.argsShape>): Promise<CallToolResult> {
         const provider = await this.ensureConnected();
-        const documents = await provider.find(database, collection, {}, { limit: 5 }).toArray();
+        const effectiveDatabase = this.getEffectiveDatabase(database);
+        const documents = await provider.find(effectiveDatabase, collection, {}, { limit: 5 }).toArray();
         const schema = await getSimplifiedSchema(documents);
 
         const fieldsCount = Object.entries(schema).length;
@@ -20,7 +21,7 @@ export class CollectionSchemaTool extends MongoDBToolBase {
             return {
                 content: [
                     {
-                        text: `Could not deduce the schema for "${database}.${collection}". This may be because it doesn't exist or is empty.`,
+                        text: `Could not deduce the schema for "${effectiveDatabase}.${collection}". This may be because it doesn't exist or is empty.`,
                         type: "text",
                     },
                 ],
@@ -30,7 +31,7 @@ export class CollectionSchemaTool extends MongoDBToolBase {
         return {
             content: [
                 {
-                    text: `Found ${fieldsCount} fields in the schema for "${database}.${collection}"`,
+                    text: `Found ${fieldsCount} fields in the schema for "${effectiveDatabase}.${collection}"`,
                     type: "text",
                 },
                 {
