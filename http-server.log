@@ -1,0 +1,11 @@
+[INFO] 1000002 - http-server: Global MCP server initialized successfully
+[INFO] 1000002 - http-server: HTTP server started on port 3002
+MongoDB MCP Server HTTP wrapper listening on port 3002
+Health check: http://localhost:3002/health
+Server info: http://localhost:3002/info
+MCP SSE endpoint: http://localhost:3002/sse
+
+To connect an MCP client via SSE, use:
+  SSE URL: http://localhost:3002/sse
+New SSE client connecting...
+Failed to setup SSE connection: Error [ERR_HTTP_HEADERS_SENT]: Cannot write headers after they are sent to the client

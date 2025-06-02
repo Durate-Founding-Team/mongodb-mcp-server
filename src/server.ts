@@ -63,9 +63,11 @@ export class Server {
             return existingHandler(request, extra);
         });
 
-        await initializeLogger(this.mcpServer, this.userConfig.logPath);
-
+        // Connect to transport first, then initialize logger
         await this.mcpServer.connect(transport);
+
+        // Initialize logger after connection is established
+        await initializeLogger(this.mcpServer, this.userConfig.logPath);
 
         this.mcpServer.server.oninitialized = () => {
             this.session.setAgentRunner(this.mcpServer.server.getClientVersion());
