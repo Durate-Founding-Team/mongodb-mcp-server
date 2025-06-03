@@ -14,7 +14,7 @@ export const FindArgs = {
         .record(z.string(), z.unknown())
         .optional()
         .describe("The projection, matching the syntax of the projection argument of db.collection.find()"),
-    limit: z.number().optional().default(0).describe("The maximum number of documents to return"),
+    limit: z.number().max(500).optional().default(0).describe("The maximum number of documents to return"),
     sort: z
         .record(z.string(), z.custom<SortDirection>())
         .optional()
